@@ -1,0 +1,61 @@
+"""
+Perturb MuJoCo *model* parameters (the physical family) at each reset.
+
+Nominals are captured once at init so every episode perturbs around the true
+baseline, never around an already-perturbed value.
+"""
+from __future__ import annotations
+import gymnasium as gym
+import numpy as np
+import mujoco
+
+from controlab.randomisation.param_spec import ParamSpec
+
+
+class RandomizedDynamicsWrapper(gym.Wrapper):
+    def __init__(self, env: gym.Env,
+                 path: str,
+                 alpha: float,
+                 rng: np.random.Generator,
+                 mode: str,
+                 test_bucket: str | None = None):
+        super().__init__(env)
+        self.alpha = alpha
+        self.rng = rng
+        self.mode = mode              # "train" | "test"
+        self.test_bucket = test_bucket
+        self.param_spec = ParamSpec()
+        self.param_spec.from_yaml(path)
+
+        model = env.unwrapped.model
+        # resolve once: name -> the (array, index) slot to write
+        self.index = {
+            "pole_mass": (model.body_mass, model.body("pole").id),
+            "cart_mass": (model.body_mass, model.body("cart").id),
+            "pole_length": (model.geom_size, (model.geom("cpole").id, 1)),  # 2D idx
+            "actuator_gain": (model.actuator_gainprm, (model.actuator("slide").id, 0)),
+            "hinge_damping": (model.dof_damping, model.jnt("hinge").dofadr[0]),
+            "slider_damping": (model.dof_damping, model.jnt("slider").dofadr[0]),
+        }
+        self.nominals = {k: float(arr[idx]) for k, (arr, idx) in self.index.items()}
+
+
+    def apply_values(self, sampled_values: dict[str, float]) -> None:
+        """Write sampled physical params into the MuJoCo model arrays."""
+        for name, val in sampled_values.items():
+            arr, idx = self.index[name]
+            arr[idx] = val  # writes into the live model
+        model = self.env.unwrapped.model
+        data = self.env.unwrapped.data
+        mujoco.mj_setConst(model, data)
+
+    def reset(self, **kwargs):
+        if self.mode == "train":
+            sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals)
+        else:
+            sampled_values = self.param_spec.sample_test(self.rng, self.test_bucket, self.nominals)
+        self.apply_values({k: v for k, v in sampled_values.items() if k in self.index})
+        obs, info = self.env.reset(**kwargs)
+        info["sampled_values"] = sampled_values               # log the realized dynamics
+        return obs, info
+

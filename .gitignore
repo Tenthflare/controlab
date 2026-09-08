@@ -1,0 +1,21 @@
+# Virtual environments
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Python caches / build
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Experiment outputs (regenerable)
+output/
+
+# Stale pre-refactor outputs (safe to remove entirely)
+src/controlab/train/logs/
+src/controlab/train/saved_model/

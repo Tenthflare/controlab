@@ -1,0 +1,9 @@
+{
+  "seed": 42,
+  "base_env": "InvertedPendulum-v5",
+  "param_spec": "src/controlab/randomisation/inverted_pendulum_param.yaml",
+  "test_bucket": "nominal",
+  "alpha": 0.0,
+  "mode": "train",
+  "total_timesteps": 50000
+}

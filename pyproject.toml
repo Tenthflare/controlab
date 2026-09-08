@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "controlab"
+version = "0.1.0"
+description = "Zero-shot policy transfer under domain randomisation"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Dustin Erhard Theofilus", email = "dustintheofilus@gmail.com" }]
+
+dependencies = [
+  "gymnasium",
+  "pyyaml",
+  "gymnasium[mujoco]",
+  "tensorboard",
+  "numpy",
+  "stable-baselines3",
+  "rliable",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  "mypy",
+  "pandas-stubs",        # type stubs so mypy understands pandas
+]
+
+[project.scripts]
+controlab-run = "controlab.pipeline.cli:main"
+
+[tool.ruff]
+line-length = 100
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/controlab"]

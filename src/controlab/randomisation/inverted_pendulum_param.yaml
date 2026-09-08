@@ -1,0 +1,26 @@
+# Randomization parameter specification.
+# Each entry: nominal value of parameter i from the MuJoCo model at load time (nominal: auto), or an explicit nominal for interface params
+
+# Randomisation range for each is bounded by `half_range` (delta_i) and controlled by alpha.
+# Max half range at alpha=1. Values are sampled from uniform distribution U(c_i - delta_i, c_i + delta_i)
+
+
+physical:
+  pole_mass:        { mujoco_field: body_mass,     selector: pole,   half_range: 0.40, scale: frac }
+  pole_length:      { mujoco_field: geom_size,     selector: cpole,  half_range: 0.30, scale: frac }
+  cart_mass:        { mujoco_field: body_mass,     selector: cart,   half_range: 0.30, scale: frac }
+  hinge_damping:    { mujoco_field: dof_damping,   selector: hinge,  half_range: 1.00, scale: frac }
+  slider_damping:   { mujoco_field: dof_damping,   selector: slider, half_range: 1.00, scale: frac }
+  actuator_gain:    { mujoco_field: actuator_gainprm, selector: slide, half_range: 0.25, scale: frac }
+
+interface:
+  obs_noise_std:     { wrapper: ObservationNoise, nominal: 0.0,  half_range: 0.05, scale: abs }
+  obs_bias:          { wrapper: ObservationNoise, nominal: 0.0,  half_range: 0.02, scale: abs }
+  action_latency:    { wrapper: ActionLatency,    nominal: 0,    half_range: 3,    scale: abs, integer: true }
+  disturbance_force: { wrapper: DisturbanceForce, nominal: 0.0,  half_range: 1.0,  scale: abs }
+
+# Test buckets: how sampled values relate to the trained range.
+test_buckets:
+  nominal:        { mode: fixed_nominal }
+  interpolation:  { mode: uniform, lo_mult: 0.0, hi_mult: 1.0 }   # within trained range
+  extrapolation:  { mode: uniform, lo_mult: 1.0, hi_mult: 1.5 }   # beyond trained range
