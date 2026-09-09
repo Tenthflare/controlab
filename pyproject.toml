@@ -9,6 +9,7 @@ description = "Zero-shot policy transfer under domain randomisation"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Dustin Erhard Theofilus"}]
+license = "MIT"
 
 dependencies = [
   "gymnasium",
