@@ -108,3 +108,14 @@ class ParamSpec:
 
         return sampled_values
 
+    def make_test_set(self,
+                      buckets: list[str],
+                      n_per_bucket: int,
+                      nominals: dict[str, float],
+                      eval_seed: int = 12345) -> dict[str, list[dict]]:
+        """Pre-sample n dynamics per bucket, once, deterministically."""
+        eval_rng = np.random.default_rng(eval_seed)
+        return {
+            bucket: [self.sample_test(eval_rng, bucket, nominals) for _ in range(n_per_bucket)]
+            for bucket in buckets
+        }

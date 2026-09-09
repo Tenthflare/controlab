@@ -39,7 +39,6 @@ class RandomizedDynamicsWrapper(gym.Wrapper):
         }
         self.nominals = {k: float(arr[idx]) for k, (arr, idx) in self.index.items()}
 
-
     def apply_values(self, sampled_values: dict[str, float]) -> None:
         """Write sampled physical params into the MuJoCo model arrays."""
         for name, val in sampled_values.items():
@@ -49,13 +48,20 @@ class RandomizedDynamicsWrapper(gym.Wrapper):
         data = self.env.unwrapped.data
         mujoco.mj_setConst(model, data)
 
-    def reset(self, **kwargs):
-        if self.mode == "train":
-            sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals)
-        else:
-            sampled_values = self.param_spec.sample_test(self.rng, self.test_bucket, self.nominals)
+    def reset(self, *, seed=None, options=None):
+        if seed is not None:
+            # reseed the shared rng IN PLACE so noise/latency/disturbance replay
+            # identical realizations across policies -> strict pairing
+            self.rng.bit_generator.state = np.random.default_rng(seed).bit_generator.state
+        options = options or {}
+        sampled_values = options.pop("sampled_values", None)
+        if sampled_values is None:
+            if self.mode == "train":
+                sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals)
+            else:
+                sampled_values = self.param_spec.sample_test(self.rng, self.test_bucket, self.nominals)
         self.apply_values({k: v for k, v in sampled_values.items() if k in self.index})
-        obs, info = self.env.reset(**kwargs)
+        obs, info = self.env.reset(seed=seed, options=options or None)
         info["sampled_values"] = sampled_values               # log the realized dynamics
         return obs, info
 

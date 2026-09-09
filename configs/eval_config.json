@@ -1,0 +1,12 @@
+{
+  "seed": 12345,
+  "base_env": "InvertedPendulum-v5",
+  "param_spec": "src/controlab/randomisation/inverted_pendulum_param.yaml",
+  "run_path": "output/runs.json",
+  "test_buckets": ["nominal", "interpolation", "extrapolation"],
+  "eval_output_path": "output/eval_results.parquet",
+  "n_per_bucket": 30,
+  "mode": "test",
+  "horizon": 1000,
+  "num_episode": 5
+}

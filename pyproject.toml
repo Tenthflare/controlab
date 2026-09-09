@@ -14,10 +14,12 @@ dependencies = [
   "gymnasium",
   "pyyaml",
   "gymnasium[mujoco]",
+  "pyarrow",
   "tensorboard",
   "numpy",
   "stable-baselines3",
   "rliable",
+  "pandas"
 ]
 
 [project.optional-dependencies]
