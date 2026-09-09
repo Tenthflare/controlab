@@ -5,14 +5,18 @@ delayed actuation, and external disturbances. Each reads its per-episode
 parameter from `info["sampled_values"]` (set by RandomizedDynamicsWrapper) so all
 randomization is drawn in one place and logged together.
 """
+
 from __future__ import annotations
+
 import collections
+
 import gymnasium as gym
 import numpy as np
 
 
 class ObservationNoise(gym.ObservationWrapper):
     """Add Gaussian noise (std=obs_noise_std) and a fixed bias (obs_bias)."""
+
     def __init__(self, env, rng: np.random.Generator):
         super().__init__(env)
         self.rng = rng
@@ -29,8 +33,10 @@ class ObservationNoise(gym.ObservationWrapper):
         # applied to every obs (ObservationWrapper wraps reset & step returns)
         return obs + self.bias + self.rng.normal(0.0, self.std, size=obs.shape)
 
+
 class ActionLatency(gym.Wrapper):
     """Delay actions by L control steps via a FIFO buffer (L from xi)."""
+
     def __init__(self, env, rng: np.random.Generator):
         super().__init__(env)
         self.rng = rng
@@ -48,15 +54,15 @@ class ActionLatency(gym.Wrapper):
     def step(self, action):
         if self.buffer_length == 0:
             return self.env.step(action)
-        self.buffer.append(action)          # push newest
-        delayed = self.buffer.popleft()     # pop oldest -> actually execute
+        self.buffer.append(action)  # push newest
+        delayed = self.buffer.popleft()  # pop oldest -> actually execute
         return self.env.step(delayed)
 
 
 class DisturbanceForce(gym.Wrapper):
     """Occasionally apply an external push (magnitude from sampled_value) via xfrc_applied."""
-    def __init__(self, env, rng: np.random.Generator,
-                 prob: float = 0.01):
+
+    def __init__(self, env, rng: np.random.Generator, prob: float = 0.01):
         super().__init__(env)
         self.rng = rng
         self.prob = prob

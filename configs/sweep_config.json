@@ -5,5 +5,5 @@
   "test_bucket": "nominal",
   "alpha": [0.0, 0.1, 0.25, 0.5, 0.75, 1.0],
   "mode": "train",
-  "total_timesteps": 50000
+  "total_timesteps": 500000
 }

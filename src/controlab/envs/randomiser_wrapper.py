@@ -4,25 +4,30 @@ Perturb MuJoCo *model* parameters (the physical family) at each reset.
 Nominals are captured once at init so every episode perturbs around the true
 baseline, never around an already-perturbed value.
 """
+
 from __future__ import annotations
+
 import gymnasium as gym
-import numpy as np
 import mujoco
+import numpy as np
 
 from controlab.randomisation.param_spec import ParamSpec
 
 
-class RandomizedDynamicsWrapper(gym.Wrapper):
-    def __init__(self, env: gym.Env,
-                 path: str,
-                 alpha: float,
-                 rng: np.random.Generator,
-                 mode: str,
-                 test_bucket: str | None = None):
+class RandomisedDynamicsWrapper(gym.Wrapper):
+    def __init__(
+        self,
+        env: gym.Env,
+        path: str,
+        alpha: float,
+        rng: np.random.Generator,
+        mode: str,
+        test_bucket: str | None = None,
+    ):
         super().__init__(env)
         self.alpha = alpha
         self.rng = rng
-        self.mode = mode              # "train" | "test"
+        self.mode = mode  # "train" | "test"
         self.test_bucket = test_bucket
         self.param_spec = ParamSpec()
         self.param_spec.from_yaml(path)
@@ -48,7 +53,7 @@ class RandomizedDynamicsWrapper(gym.Wrapper):
         data = self.env.unwrapped.data
         mujoco.mj_setConst(model, data)
 
-    def reset(self, *, seed=None, options=None):
+    def reset(self, *, seed: int =None, options=None):
         if seed is not None:
             # reseed the shared rng IN PLACE so noise/latency/disturbance replay
             # identical realizations across policies -> strict pairing
@@ -59,9 +64,10 @@ class RandomizedDynamicsWrapper(gym.Wrapper):
             if self.mode == "train":
                 sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals)
             else:
-                sampled_values = self.param_spec.sample_test(self.rng, self.test_bucket, self.nominals)
+                sampled_values = self.param_spec.sample_test(
+                    self.rng, self.test_bucket, self.nominals
+                )
         self.apply_values({k: v for k, v in sampled_values.items() if k in self.index})
         obs, info = self.env.reset(seed=seed, options=options or None)
-        info["sampled_values"] = sampled_values               # log the realized dynamics
+        info["sampled_values"] = sampled_values  # log the realized dynamics
         return obs, info
-

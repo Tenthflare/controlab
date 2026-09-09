@@ -13,3 +13,5 @@ source venv/bin/activate
 pip install -e ".[dev]"
 python main.py configs/test_config.json
 
+Check tensorboard logs here: tensorboard --logdir output/logs
+

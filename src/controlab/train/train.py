@@ -4,13 +4,18 @@
 once per config. It is deliberately free of argument parsing and file discovery
 so it can be driven from a loop, a notebook, or a test.
 """
+
 from __future__ import annotations
+
 import os
 from pathlib import Path
+import torch
+torch.set_num_threads(1)
 
 # quiet TensorFlow/oneDNN chatter before SB3 imports them
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
+
 
 from stable_baselines3 import SAC
 from stable_baselines3.common.logger import configure
@@ -52,4 +57,4 @@ def train(config: dict) -> Path:
 
     save_path = model_dir / run_name
     model.save(str(save_path))
-    return save_path.with_suffix(".zip")
+    return save_path
