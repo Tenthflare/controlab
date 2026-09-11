@@ -15,3 +15,5 @@ python main.py configs/test_config.json
 
 Check tensorboard logs here: tensorboard --logdir output/logs
 
+WIP - Finishing in a few days
+
