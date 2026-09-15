@@ -51,13 +51,17 @@ class ParamSpec:
                     )
                 )
 
-    def sample_train(
-        self, rng: np.random.Generator, alpha: float, nominals: dict[str, float]
-    ) -> dict[str, float]:
+    def sample_train(self,
+                     rng: np.random.Generator,
+                     alpha: float,
+                     nominals: dict[str, float],
+                     families: str | None = None) -> dict[str, float]:
         """Sample from U(c - alpha*delta, c + alpha*delta) per parameter.
 
         `nominals` supplies c_i for params whose nominal is read from the model.
         `scale == "frac"` interprets delta as a fraction of c_i; "abs" as absolute.
+        'families == None' randomize both 'physical' and 'interface' family.
+        Otherwise, select one family to randomize and other family pinned at nominal value.
         """
         sampled_values: dict[str, float] = {}
         for i in range(len(self.specs)):
@@ -72,11 +76,13 @@ class ParamSpec:
                 if self.specs[i].scale == "frac"
                 else self.specs[i].half_range
             )
+            chosen_alpha = alpha if (families is None or self.specs[i].family in families) else 0.0
+
             # alpha=0 returns nominals
-            if alpha == 0:
+            if chosen_alpha == 0:
                 sample = nominal_value
             else:
-                delta *= alpha
+                delta *= chosen_alpha
                 if self.specs[i].name == "obs_bias":
                     sample = rng.uniform(nominal_value - delta, nominal_value + delta)
                 else:

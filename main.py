@@ -17,8 +17,8 @@ from pathlib import Path
 from controlab.train.train import train
 
 REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG = REPO_ROOT / "configs" / "sweep_config.json"
-RUNS_OUTPUT = REPO_ROOT / "output" / "runs.json"
+DEFAULT_CONFIG = REPO_ROOT / "configs" / "randomise_interface_config.json"
+RUNS_OUTPUT = REPO_ROOT / "output" / "interface_runs.json"
 
 def load_config(path: Path) -> dict:
     return json.loads(path.read_text())
@@ -49,6 +49,8 @@ def main(argv: list[str]) -> None:
                 "mode": full_config["mode"],
                 "alpha": alpha,
                 "seed": seed,
+                "families": full_config.get("families"),
+                "label": full_config.get("label", "")
             }
             print(f"=== Training {p.name}: alpha={alpha} seed={seed} ===")
             saved = train(indiv_config)

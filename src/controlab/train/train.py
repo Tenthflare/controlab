@@ -33,7 +33,10 @@ def train(config: dict) -> Path:
     is independent of the current working directory.
     """
     seed = config["seed"]
-    run_name = f"sac_alpha{config['alpha']}_seed{seed}"
+    label = config.get("label", "")
+    prefix = f"sac_{label}_" if label else "sac_"
+    run_name = f"{prefix}alpha{config['alpha']}_seed{config['seed']}"
+    families = set(config["families"]) if config.get("families") else None
 
     out_dir = REPO_ROOT / "output"
     log_dir = out_dir / "logs" / run_name
@@ -49,6 +52,7 @@ def train(config: dict) -> Path:
         test_bucket=config["test_bucket"],
         alpha=config["alpha"],
         mode=config["mode"],
+        families=families
     )
 
     model = SAC("MlpPolicy", env, seed=seed, verbose=1)

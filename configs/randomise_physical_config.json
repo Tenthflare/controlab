@@ -1,0 +1,11 @@
+{
+  "label": "physical",
+  "families": ["physical"],
+  "seed": [0, 1, 2, 3, 4],
+  "base_env": "InvertedPendulum-v5",
+  "param_spec": "src/controlab/randomisation/inverted_pendulum_param.yaml",
+  "test_bucket": "nominal",
+  "alpha": 0.75,
+  "mode": "train",
+  "total_timesteps": 500000
+}

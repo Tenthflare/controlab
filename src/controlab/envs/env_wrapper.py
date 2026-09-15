@@ -15,12 +15,12 @@ from controlab.envs.randomiser_wrapper import RandomisedDynamicsWrapper
 
 
 def build_env(
-    seed: int, base_env: str, path: str, test_bucket: str, alpha: float, mode: str
+    seed: int, base_env: str, path: str, test_bucket: str, alpha: float, mode: str, families=None
 ) -> gym.Env:
     rng = np.random.default_rng(seed)
     env = gym.make(base_env)
     env = RandomisedDynamicsWrapper(
-        env=env, path=path, alpha=alpha, rng=rng, test_bucket=test_bucket, mode=mode
+        env=env, path=path, alpha=alpha, rng=rng, test_bucket=test_bucket, mode=mode, families=families
     )
     env = ObservationNoise(env=env, rng=rng)
     env = ActionLatency(env=env, rng=rng)

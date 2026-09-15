@@ -7,9 +7,10 @@ baseline, never around an already-perturbed value.
 
 from __future__ import annotations
 
+from typing import Any
+
 import gymnasium as gym
 import mujoco
-from typing import Any
 import numpy as np
 
 from controlab.randomisation.param_spec import ParamSpec
@@ -24,12 +25,14 @@ class RandomisedDynamicsWrapper(gym.Wrapper):
         rng: np.random.Generator,
         mode: str,
         test_bucket: str | None = None,
+        families: set[str] | None = None
     ):
         super().__init__(env)
         self.alpha = alpha
         self.rng = rng
         self.mode = mode  # "train" | "test"
         self.test_bucket = test_bucket
+        self.families = families
         self.param_spec = ParamSpec()
         self.param_spec.from_yaml(path)
 
@@ -54,8 +57,7 @@ class RandomisedDynamicsWrapper(gym.Wrapper):
         data = self.env.unwrapped.data  # type: ignore[attr-defined]
         mujoco.mj_setConst(model, data)
 
-    def reset(self, *, seed: int | None = None,
-              options: dict[str, Any] | None = None):
+    def reset(self, *, seed: int | None = None, options: dict[str, Any] | None = None):
         if seed is not None:
             # reseed the shared rng IN PLACE so noise/latency/disturbance replay
             # identical realizations across policies -> strict pairing
@@ -64,7 +66,7 @@ class RandomisedDynamicsWrapper(gym.Wrapper):
         sampled_values = options.pop("sampled_values", None)
         if sampled_values is None:
             if self.mode == "train":
-                sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals)
+                sampled_values = sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals, self.families)
             else:
                 assert self.test_bucket is not None
                 sampled_values = self.param_spec.sample_test(
