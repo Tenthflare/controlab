@@ -7,7 +7,7 @@ name = "controlab"
 version = "0.1.0"
 description = "Zero-shot policy transfer under domain randomisation"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [{ name = "Dustin Erhard Theofilus"}]
 license = "MIT"
 
@@ -40,7 +40,7 @@ line-length = 100
 select = ["E", "F", "I", "B", "UP"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 ignore_missing_imports = true
 warn_unused_ignores = true
 

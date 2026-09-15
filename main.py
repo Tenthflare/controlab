@@ -7,11 +7,12 @@ Usage:
     python main.py configs/a.json configs/b.json   # several, in sequence
 """
 from __future__ import annotations
-import sys
-import json
-from pathlib import Path
+
 import hashlib
 import itertools
+import json
+import sys
+from pathlib import Path
 
 from controlab.train.train import train
 

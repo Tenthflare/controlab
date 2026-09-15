@@ -29,8 +29,8 @@ class ParamSpec:
     """Parsed param_spec.yaml with alpha-aware sampling."""
 
     def __init__(self):
-        self.specs: list[ParamDef] = []
-        self.test_buckets: dict = {}
+        self.specs = []
+        self.test_buckets = {}
 
     def from_yaml(self, path: str | Path) -> None:
         raw = yaml.safe_load(Path(path).read_text())
@@ -116,7 +116,7 @@ class ParamSpec:
                 )
                 # downward allowed only if it stays valid (>=0); obs_bias is signed
                 if self.specs[i].name == "obs_bias" or (nominal_value - magnitude) >= 0:
-                    sign = rng.choice([-1, 1])
+                    sign = int(rng.choice([-1, 1]))
                 else:
                     sign = 1
                 sample = nominal_value + sign * magnitude

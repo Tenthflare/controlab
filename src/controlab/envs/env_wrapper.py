@@ -14,12 +14,9 @@ from controlab.envs.interface_wrapper import ActionLatency, DisturbanceForce, Ob
 from controlab.envs.randomiser_wrapper import RandomisedDynamicsWrapper
 
 
-def build_env(seed: int,
-              base_env: str,
-              path: str,
-              test_bucket: str,
-              alpha: float,
-              mode: str) -> gym.Env:
+def build_env(
+    seed: int, base_env: str, path: str, test_bucket: str, alpha: float, mode: str
+) -> gym.Env:
     rng = np.random.default_rng(seed)
     env = gym.make(base_env)
     env = RandomisedDynamicsWrapper(

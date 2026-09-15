@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import gymnasium as gym
 import mujoco
+from typing import Any
 import numpy as np
 
 from controlab.randomisation.param_spec import ParamSpec
@@ -32,7 +33,7 @@ class RandomisedDynamicsWrapper(gym.Wrapper):
         self.param_spec = ParamSpec()
         self.param_spec.from_yaml(path)
 
-        model = env.unwrapped.model
+        model = env.unwrapped.model  # type: ignore[attr-defined]
         # resolve once: name -> the (array, index) slot to write
         self.index = {
             "pole_mass": (model.body_mass, model.body("pole").id),
@@ -49,11 +50,12 @@ class RandomisedDynamicsWrapper(gym.Wrapper):
         for name, val in sampled_values.items():
             arr, idx = self.index[name]
             arr[idx] = val  # writes into the live model
-        model = self.env.unwrapped.model
-        data = self.env.unwrapped.data
+        model = self.env.unwrapped.model  # type: ignore[attr-defined]
+        data = self.env.unwrapped.data  # type: ignore[attr-defined]
         mujoco.mj_setConst(model, data)
 
-    def reset(self, *, seed: int =None, options=None):
+    def reset(self, *, seed: int | None = None,
+              options: dict[str, Any] | None = None):
         if seed is not None:
             # reseed the shared rng IN PLACE so noise/latency/disturbance replay
             # identical realizations across policies -> strict pairing
@@ -64,6 +66,7 @@ class RandomisedDynamicsWrapper(gym.Wrapper):
             if self.mode == "train":
                 sampled_values = self.param_spec.sample_train(self.rng, self.alpha, self.nominals)
             else:
+                assert self.test_bucket is not None
                 sampled_values = self.param_spec.sample_test(
                     self.rng, self.test_bucket, self.nominals
                 )

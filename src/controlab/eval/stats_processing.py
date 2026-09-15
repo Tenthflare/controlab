@@ -18,10 +18,9 @@ from rliable import library as rly
 from rliable import metrics
 
 
-def score_matrix( df: pd.DataFrame,
-                  alpha: float,
-                  bucket: str,
-                  value: str = "episode_reward") -> np.ndarray:
+def score_matrix(
+    df: pd.DataFrame, alpha: float, bucket: str, value: str = "episode_reward"
+) -> np.ndarray:
     """
     (num_seeds, num_tasks) score matrix for one (alpha, bucket).
 
@@ -43,9 +42,9 @@ def aggregate_iqm(x):
     return np.array([metrics.aggregate_iqm(x)])
 
 
-def iqm_with_ci(scores: np.ndarray,
-                reps: int = 5000,
-                alpha: float = 0.05) -> tuple[float, float, float]:
+def iqm_with_ci(
+    scores: np.ndarray, reps: int = 5000, alpha: float = 0.05
+) -> tuple[float, float, float]:
     """
     Interquartile mean + (1-alpha) stratified-bootstrap CI.
 
@@ -66,10 +65,9 @@ def iqm_with_ci(scores: np.ndarray,
     return iqm, lo, hi
 
 
-def probability_of_improvement(scores_x: np.ndarray,
-                               scores_y: np.ndarray,
-                               reps: int = 5000,
-                               alpha: float = 0.05) -> tuple[float, float, float]:
+def probability_of_improvement(
+    scores_x: np.ndarray, scores_y: np.ndarray, reps: int = 5000, alpha: float = 0.05
+) -> tuple[float, float, float]:
     """
     P(breadth X > breadth Y) averaged over tasks, with bootstrap CI.
 
@@ -89,10 +87,9 @@ def probability_of_improvement(scores_x: np.ndarray,
     return p, lo, hi
 
 
-def robustness_curve(df: pd.DataFrame,
-                     bucket: str,
-                     value: str = "episode_reward",
-                     reps: int = 5000) -> pd.DataFrame:
+def robustness_curve(
+    df: pd.DataFrame, bucket: str, value: str = "episode_reward", reps: int = 5000
+) -> pd.DataFrame:
     """
     Per-alpha IQM (+95% CI) for one bucket -> tidy frame for plotting.
 

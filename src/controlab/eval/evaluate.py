@@ -1,14 +1,16 @@
 """
 Evaluate every checkpoint on the shared, fixed test set and log tidy rows.
 
-Each policy is evaluated with horizon=1000 timesteps for 5 episodes  (seeds) for each set of test param values.
+Each policy is evaluated with horizon=1000 timesteps for
+5 episodes (seeds) for each set of test param values.
 There are 30 param values for each of three buckets (nominal, interpolation, extrapolation)
 
 Primary metric is episodic return per set of param values
 Secondary metric is survival rate (fraction of policies reaching the horizon
 Output: one parquet with columns
     [alpha, seed, bucket, set_id, episode, return, survived]
-which is all downstream stats/figures need. The test set is generated once so every policy faces identical dynamics (paired).
+which is all downstream stats/figures need. The test set is generated once
+so every policy faces identical dynamics (paired).
 """
 
 from __future__ import annotations
@@ -73,7 +75,7 @@ def evaluate_checkpoint(eval_config: dict) -> None:
                     for _ in range(horizon):
                         action, _ = model.predict(obs, deterministic=True)
                         obs, reward, terminated, truncated, info = env.step(action)
-                        ep_reward += reward
+                        ep_reward += float(reward)
                         steps += 1
                         done = terminated or truncated
                         if done:

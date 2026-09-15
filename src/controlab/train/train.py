@@ -9,18 +9,18 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+
 import torch
+from stable_baselines3 import SAC
+from stable_baselines3.common.logger import configure
+
+from controlab.envs.env_wrapper import build_env
+
 torch.set_num_threads(1)
 
 # quiet TensorFlow/oneDNN chatter before SB3 imports them
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
-
-
-from stable_baselines3 import SAC
-from stable_baselines3.common.logger import configure
-
-from controlab.envs.env_wrapper import build_env
 
 # repo root = .../controlab  (train.py is src/controlab/train/train.py)
 REPO_ROOT = Path(__file__).resolve().parents[3]
